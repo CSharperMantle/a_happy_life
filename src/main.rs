@@ -8,26 +8,6 @@ use std::str;
 
 use tempfile::tempdir;
 
-/*
- const EXP_1: &'static str = r#"
-
- fn aux<'a, 'b, T>(_: Option<&'a &'b ()>, v: &'b T) -> &'a T { v }
-
- fn exp<'c, 'd, T>(x: &'c T) -> &'d T {
-     let f: fn(Option<&'d &'d ()>, &'c T) -> &'d T = aux;
-     f(None, x)
- }
-
- "#;
-
- const EXP_2: &'static str = r#"
-
- let local = String::from("aaaabaaacaaadaaa"); // <-- Same length as flag
- exp(&local)
-
- "#;
-*/
-
 const ALLOC_FILE_CONTENT: &'static str = r#"
 #![feature(allocator_api)]
 #![feature(alloc)]
@@ -38,7 +18,7 @@ pub use std::alloc::System;
 static GLOBAL: System = System;
 
 pub fn print(s: &str) {
-    println!("s = {}", s);
+    println!("my_alloc::print(&str) says: {}", s);
 }
 "#;
 
@@ -64,8 +44,7 @@ fn main() {
         .args([
             "--edition",
             "2021",
-            "-C",
-            "opt-level=0",
+            "-O",
             "--crate-type=lib",
             "-o",
             "libmy_alloc.rlib",
@@ -82,7 +61,7 @@ fn main() {
     let src_path = tmp_dir.path().join("main.rs");
     let mut src_file = File::create(src_path).expect("failed to src file");
 
-    println!("Welcome to this challenge!");
+    println!("Rust can promise you a happy life... but does this statement always hold?");
     println!("rustc version: {}", rustc_version);
     println!(
         "Fill in this code:\n\n=====BEGIN====={}\n=====END=====\n",
@@ -101,12 +80,12 @@ fn main() {
     let x = {
         [YOUR CODE PART 2]
     };
-    let _secret = String::from("[???]");
+    let _secret = String::from("???");
     my_alloc::print(&x);
 }"#
     );
-    println!("where there are {} chars in [???].", flag.len());
-    println!("Now fill in PART 1, end with a single line containing \"[END]\".");
+    println!("where there are {} chars in \"???\".", flag.len());
+    println!("Now give me PART 1. End your input with a single line containing \"[END]\".");
     let mut part_1 = String::new();
     loop {
         let mut this_line = String::new();
@@ -118,7 +97,7 @@ fn main() {
         }
         part_1.push_str(&this_line);
     }
-    println!("Now fill in PART 2, end with a single line containing \"[END]\".");
+    println!("Now give me PART 2. End your input with a single line containing \"[END]\".");
     let mut part_2 = String::new();
     loop {
         let mut this_line = String::new();
