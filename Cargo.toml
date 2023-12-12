@@ -5,3 +5,14 @@ edition = "2021"
 
 [dependencies]
 tempfile = "3.8.1"
+
+[profile.dev]
+debug = true
+panic = "abort"
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+panic = "abort"
+

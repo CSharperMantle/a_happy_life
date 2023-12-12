@@ -8,7 +8,7 @@ use std::str;
 
 use tempfile::tempdir;
 
-const ALLOC_FILE_CONTENT: &'static str = r#"
+const ALLOC_FILE_CONTENT: &str = r#"
 pub use std::alloc::System;
 
 #[global_allocator]
