@@ -49,5 +49,7 @@ The value `local` is dropped once it leaves its scope. But as the compiler think
 
 ## Requirements
 
-* `rustc` on PATH, tested with `rustc 1.76.0-nightly (d86d65bbc 2023-12-10)`
+* `rustc` on PATH. Tested with these following compilers:
+  * `rustc 1.76.0-nightly (d86d65bbc 2023-12-10)`
+  * `rustc 1.74.0 (79e9716c9 2023-11-13) (built from a source tarball)`
 * Flag in environment variable `FLAG`
