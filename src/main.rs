@@ -22,11 +22,10 @@ pub fn print(s: &str) {
 fn main() {
     let out = process::Command::new("rustc")
         .arg("-V")
-        .env_clear()
         .output()
         .expect("failed to check rustc version");
     if !out.status.success() {
-        panic!("no rustc found");
+        panic!("no rustc found on PATH");
     }
     let rustc_version = str::from_utf8(&out.stdout).expect("failed to decode stdout as utf-8");
 
