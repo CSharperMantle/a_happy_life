@@ -26,8 +26,7 @@ fn main() {
         .output()
         .expect("failed to check rustc version");
     if !out.status.success() {
-        eprintln!("no rustc found");
-        process::exit(1);
+        panic!("no rustc found");
     }
     let rustc_version = str::from_utf8(&out.stdout).expect("failed to decode stdout as utf-8");
 
@@ -51,8 +50,7 @@ fn main() {
         .output()
         .expect("failed to run rustc");
     if !out.status.success() {
-        eprintln!("failed to compile proxy lib");
-        process::exit(1);
+        panic!("failed to compile proxy lib");
     }
 
     let src_path = tmp_dir.path().join("main.rs");
