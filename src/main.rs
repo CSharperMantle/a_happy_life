@@ -9,16 +9,13 @@ use std::str;
 use tempfile::tempdir;
 
 const ALLOC_FILE_CONTENT: &'static str = r#"
-#![feature(allocator_api)]
-#![feature(alloc)]
-
 pub use std::alloc::System;
 
 #[global_allocator]
 static GLOBAL: System = System;
 
 pub fn print(s: &str) {
-    println!("my_alloc::print(&str) says: {}", s);
+    println!("my_proxy::print(s: &str) says: {}", s);
 }
 "#;
 
@@ -37,7 +34,7 @@ fn main() {
     let flag = env::var("FLAG").expect("no FLAG env var found");
     let tmp_dir = tempdir().expect("failed to create temp dir");
 
-    let alloc_path = tmp_dir.path().join("my_alloc.rs");
+    let alloc_path = tmp_dir.path().join("my_proxy.rs");
     let mut alloc_file = File::create(alloc_path).expect("failed to create alloc file");
     writeln!(alloc_file, "{}", ALLOC_FILE_CONTENT).expect("failed to write to alloc file");
     let out = process::Command::new("rustc")
@@ -47,8 +44,8 @@ fn main() {
             "-O",
             "--crate-type=lib",
             "-o",
-            "libmy_alloc.rlib",
-            "my_alloc.rs",
+            "libmy_proxy.rlib",
+            "my_proxy.rs",
         ])
         .current_dir(tmp_dir.path())
         .output()
@@ -67,10 +64,9 @@ fn main() {
         "Fill in this code:\n\n=====BEGIN====={}\n=====END=====\n",
         r#"
 #![no_std]
-#![feature(alloc)]
 #![forbid(unsafe_code)]
 
-extern crate my_alloc;
+extern crate my_proxy;
 extern crate alloc;
 use alloc::string::String;
 
@@ -81,7 +77,7 @@ fn main() {
         [YOUR CODE PART 2]
     };
     let _secret = String::from("???");
-    my_alloc::print(&x);
+    my_proxy::print(&x);
 }"#
     );
     println!("where there are {} chars in \"???\".", flag.len());
@@ -113,10 +109,9 @@ fn main() {
     let src_content = format!(
         r#"
 #![no_std]
-#![feature(alloc)]
 #![forbid(unsafe_code)]
 
-extern crate my_alloc;
+extern crate my_proxy;
 extern crate alloc;
 use alloc::string::String;
 
@@ -127,7 +122,7 @@ fn main() {{
         {}
     }};
     let y = String::from("{}");
-    my_alloc::print(&x);
+    my_proxy::print(&x);
 }}"#,
         part_1, part_2, flag
     );
@@ -141,7 +136,7 @@ fn main() {{
             "-C",
             "opt-level=0",
             "--extern",
-            "my_alloc=libmy_alloc.rlib",
+            "my_proxy=libmy_proxy.rlib",
             "-o",
             "main.exe",
             "main.rs",
