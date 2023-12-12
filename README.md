@@ -1,5 +1,7 @@
 # a_happy_life
 
+Challenge based on rust-lang/rust#25860.
+
 ## Idea
 
 This challenge exploits a unsoundness hole discovered in Rust lifetime deduction system. When a type like `&'a &'b ()` is encountered, the compiler implicitly relies upon `'b: 'a`, which could be broken by contravariance.
