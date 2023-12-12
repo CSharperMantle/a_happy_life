@@ -58,7 +58,7 @@ fn main() {
     let src_path = tmp_dir.path().join("main.rs");
     let mut src_file = File::create(src_path).expect("failed to src file");
 
-    println!("Rust can promise you a happy life... but does this statement always hold?");
+    println!("Rust can promise you a happy life... but does this proposition always hold?");
     println!("rustc version: {}", rustc_version);
     println!(
         "Fill in this code:\n\n=====BEGIN====={}\n=====END=====\n",
