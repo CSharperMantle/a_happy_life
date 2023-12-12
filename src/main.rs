@@ -51,7 +51,7 @@ fn main() {
         .output()
         .expect("failed to run rustc");
     if !out.status.success() {
-        println!("Oops...");
+        eprintln!("failed to compile proxy lib");
         process::exit(1);
     }
 
