@@ -45,7 +45,7 @@ exp(&local)
 
 ### Explanation
 
-The value `local` is dropped once it leaves the scope. But as the compiler thinks that `x` has a lifetime longer than `local`, the reference `x` to `local` dangles, which can then possibly (in fact almost always on `-C opt_level=0`) refer to the memory space allocated for `_secret`, creating a use-after-free scenario.
+The value `local` is dropped once it leaves its scope. But as the compiler thinks that `x`, as a reference to `local`, has a longer lifetime, it dangles after the destruction of `local`. Now, `x` could possibly (in fact, always, with `-C opt_level=0`) refer to the memory space subsequently allocated for `_secret`, creating a use-after-free scenario.
 
 ## Requirements
 
