@@ -11,7 +11,7 @@ use std::str;
 use tempfile::tempdir;
 
 const MAX_LINES: usize = 30;
-const MAX_CHARS_PER_LINE: usize = 3000;
+const MAX_CHARS_PER_LINE: usize = 120;
 
 const ALLOC_FILE_CONTENT: &str = r#"
 pub use std::alloc::System;
@@ -108,7 +108,10 @@ fn main() {
     read_into_file(tmp_dir_path, "part_1.in");
     read_into_file(tmp_dir_path, "part_2.in");
 
-    let mut f_src = File::create(tmp_dir_path.join("main.rs")).expect("failed to create main.rs");
+    let main_uuid = uuid::Uuid::new_v4();
+    let main_name = format!("main_{}.rs", main_uuid);
+
+    let mut f_src = File::create(tmp_dir_path.join(&main_name)).expect("failed to create main.rs");
     writeln!(f_src, "{}", MAIN_FILE_CONTENT.replace("@@FLAG@@", &flag))
         .expect("failed to write to main.rs");
     drop(f_src);
@@ -123,12 +126,12 @@ fn main() {
             "my_proxy=libmy_proxy.rlib",
             "-o",
             "main.exe",
-            "main.rs",
+            &main_name,
         ])
         .current_dir(tmp_dir.path())
         .env_remove("FLAG")
         .output()
-        .expect("failed to run rustc");
+        .expect("failed to compile main file");
     if !out.status.success() {
         println!("Oops...");
         process::exit(1);
@@ -139,13 +142,10 @@ fn main() {
         .current_dir(tmp_dir.path())
         .env_clear()
         .output()
-        .expect("failed to run built exe");
+        .expect("failed to run rustc");
     if !out.status.success() {
         println!("Oh no, please try again...");
         process::exit(1);
     }
-    println!(
-        "{}",
-        str::from_utf8(&out.stdout).expect("failed to decode stdout as utf-8")
-    );
+    println!("{}", String::from_utf8_lossy(&out.stdout));
 }

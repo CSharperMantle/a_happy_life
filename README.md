@@ -86,7 +86,7 @@ fn exp<'c, 'd, T>(x: &'c T) -> &'d T {
     // Create a local variable whose memory location may coincide with `_secret`.
     // The length of the `&'static str` literal should be the same as `_secret`.
     let local = String::from("aaaabaaacaaadaaa");
-    // Leak it!
+    // Make the reference dangle!
     exp(&local)
 }
 ```
@@ -116,3 +116,25 @@ Macro `core::env!` could be used to fetch env vars at compile time.
 #### Fix
 
 Remove exposed `FLAG` env var when calling `rustc`.
+
+### Unintended solution 2 (fixed in `v0.1.2`)
+
+`part_1.in`:
+
+```rust
+
+```
+
+`part_2.in`:
+
+```rust
+{ include_str!("main.rs") }
+```
+
+#### Analysis
+
+Macro `core::include_str!` could be used to include arbitrary files at compile time.
+
+#### Fix
+
+Add randomized UUID to filename `main.rs`. No other actions are required, since `core::include_str!` will not leak anything else given that the privileges of filesystem are properly set.
