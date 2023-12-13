@@ -25,7 +25,7 @@ cargo run
 
 ## Problem
 
-Given the following program snippet, find appropriate code to fill in the two blanks (`[YOUR CODE PART 1]` and `[YOUR CODE PART 2]`) so as to read variable `_secret` under the conditions that:
+Given the following program snippet, find appropriate code to fill in the two blanks (`part_1.in` and `part_2.in`) so as to read variable `_secret` under the conditions that:
 
 * No `unsafe` code allowed
 * No references to `_secret`
