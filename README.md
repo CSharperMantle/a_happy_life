@@ -40,15 +40,13 @@ extern crate my_proxy;
 extern crate alloc;
 use alloc::string::String;
 
-// [YOUR CODE PART 1]
+include!("part_1.in");
 
 fn main() {
-    let x = {
-        // [YOUR CODE PART 2]
-    };
-    let _secret = String::from("???");
+    let x = include!("part_2.in");
+    let _secret = String::from("@@FLAG@@");
     my_proxy::print(&x);
-}"
+}
 ```
 
 Crate `my_proxy` is a wrapper crate linked to `std`, but it pulls in only the global allocator and the `println!` macro.
@@ -69,7 +67,7 @@ pub fn print(s: &str) {
 
 ### Intended solution
 
-**Part 1**:
+`part_1.in`:
 
 ```rust
 // Create "any-to-any" lifetime cast function.
@@ -81,14 +79,16 @@ fn exp<'c, 'd, T>(x: &'c T) -> &'d T {
 }
 ```
 
-**Part 2**:
+`part_2.in`:
 
 ```rust
-// Create a local variable whose memory location may coincide with `_secret`.
-// The length of the `&'static str` literal should be the same as `_secret`.
-let local = String::from("aaaabaaacaaadaaa");
-// Leak it!
-exp(&local)
+{
+    // Create a local variable whose memory location may coincide with `_secret`.
+    // The length of the `&'static str` literal should be the same as `_secret`.
+    let local = String::from("aaaabaaacaaadaaa");
+    // Leak it!
+    exp(&local)
+}
 ```
 
 #### Explanation
@@ -97,16 +97,16 @@ The value `local` is dropped once it leaves its scope. But as the compiler think
 
 ### Unintended solution 1 (fixed in `v0.1.1`)
 
-**Part 1**:
+`part_1.in`:
 
 ```rust
 
 ```
 
-**Part 2**:
+`part_2.in`:
 
 ```rust
-env!("FLAG", "what?")
+{ env!("FLAG", "what?") }
 ```
 
 #### Analysis
