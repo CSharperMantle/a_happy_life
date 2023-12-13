@@ -65,9 +65,11 @@ pub fn print(s: &str) {
 }
 ```
 
-## Solution
+## Solutions
 
-Part 1:
+### Intended solution
+
+**Part 1**:
 
 ```rust
 // Create "any-to-any" lifetime cast function.
@@ -79,7 +81,7 @@ fn exp<'c, 'd, T>(x: &'c T) -> &'d T {
 }
 ```
 
-Part 2:
+**Part 2**:
 
 ```rust
 // Create a local variable whose memory location may coincide with `_secret`.
@@ -89,6 +91,28 @@ let local = String::from("aaaabaaacaaadaaa");
 exp(&local)
 ```
 
-### Explanation
+#### Explanation
 
 The value `local` is dropped once it leaves its scope. But as the compiler thinks that `x`, as a reference to `local`, has a longer lifetime, it dangles after the destruction of `local`. Now, `x` could possibly (in fact, always, with `-C opt_level=0`) refer to the memory space subsequently allocated for `_secret`, creating a use-after-free scenario.
+
+### Unintended solution 1 (fixed in `v0.1.1`)
+
+**Part 1**:
+
+```rust
+
+```
+
+**Part 2**:
+
+```rust
+env!("FLAG", "what?")
+```
+
+#### Analysis
+
+Macro `core::env!` could be used to fetch env vars at compile time.
+
+#### Fix
+
+Remove exposed `FLAG` env var when calling `rustc`.

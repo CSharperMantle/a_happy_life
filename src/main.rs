@@ -8,6 +8,9 @@ use std::str;
 
 use tempfile::tempdir;
 
+const MAX_LINES: usize = 30;
+const MAX_CHARS: usize = 3000;
+
 const ALLOC_FILE_CONTENT: &str = r#"
 pub use std::alloc::System;
 
@@ -46,6 +49,7 @@ fn main() {
             "my_proxy.rs",
         ])
         .current_dir(tmp_dir.path())
+        .env_remove("FLAG")
         .output()
         .expect("failed to run rustc");
     if !out.status.success() {
@@ -78,26 +82,30 @@ fn main() {
 }"#
     );
     println!("where there are {} chars in \"???\".", flag.len());
-    println!("Now give me PART 1. End your input with a single line containing \"[END]\".");
+    println!();
+    println!("Now give me PART 1 in no more than {} lines and {} characters.", MAX_LINES, MAX_CHARS);
+    println!("End your input with a single line containing \"[END]\".");
     let mut part_1 = String::new();
-    loop {
+    for _ in 0..MAX_LINES {
         let mut this_line = String::new();
         std::io::stdin()
             .read_line(&mut this_line)
             .expect("failed to read line");
-        if this_line.trim() == "[END]" {
+        if this_line.trim() == "[END]" || part_1.len() > MAX_CHARS {
             break;
         }
         part_1.push_str(&this_line);
     }
-    println!("Now give me PART 2. End your input with a single line containing \"[END]\".");
+
+    println!("Now give me PART 2 in no more than {} lines and {} characters.", MAX_LINES, MAX_CHARS);
+    println!("End your input with a single line containing \"[END]\".");
     let mut part_2 = String::new();
-    loop {
+    for _ in 0..MAX_LINES {
         let mut this_line = String::new();
         std::io::stdin()
             .read_line(&mut this_line)
             .expect("failed to read line");
-        if this_line.trim() == "[END]" {
+        if this_line.trim() == "[END]" || part_2.len() > MAX_CHARS {
             break;
         }
         part_2.push_str(&this_line);
@@ -139,6 +147,7 @@ fn main() {{
             "main.rs",
         ])
         .current_dir(tmp_dir.path())
+        .env_remove("FLAG")
         .output()
         .expect("failed to run rustc");
     if !out.status.success() {
