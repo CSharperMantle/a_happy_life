@@ -1,2 +1,7 @@
 {
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    "cSpell.words": [
+        "tempdir",
+        "tempfile"
+    ]
 }

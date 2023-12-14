@@ -13,6 +13,8 @@ See [rust-lang/rust#25860](https://github.com/rust-lang/rust/issues/25860) for t
 * `rustc` on `PATH`. Tested with these compilers:
   * `rustc 1.76.0-nightly (d86d65bbc 2023-12-10)`
   * `rustc 1.74.0 (79e9716c9 2023-11-13) (built from a source tarball)`
+* `clippy-driver` on `PATH`. Tested with these `clippy` versions:
+  * `clippy 0.1.76 (d86d65bb 2023-12-10)`
 * Flag in environment variable `FLAG`
 
 Run this command to start the challenge (either Release or Debug build is okay):
@@ -34,7 +36,9 @@ Given the following program snippet, find appropriate code to fill in the two bl
 ```rust
 // main.rs
 #![no_std]
+#![allow(clippy::all)]
 #![forbid(unsafe_code)]
+#![forbid(clippy::disallowed_macros)]
 
 extern crate my_proxy;
 extern crate alloc;
@@ -138,3 +142,44 @@ Macro `core::include_str!` could be used to include arbitrary files at compile t
 #### Fix
 
 Add randomized UUID to filename `main.rs`. No other actions are required, since `core::include_str!` will not leak anything else given that the privileges of filesystem are properly set.
+
+### Unintended solution 3 (unconfirmed, fixed in `v0.1.4`)
+
+On the first connection, supply these input:
+
+`part_1.in`:
+
+```rust
+
+```
+
+`part_2.in`:
+
+```rust
+{ include_str!("/proc/self/status") }
+```
+
+Then write down the parent PID (`PPID`) in the output.
+
+On the second connection, supply these:
+
+`part_1.in`:
+
+```rust
+
+```
+
+`part_2.in`:
+
+```rust
+{ include_str!("/proc/<PPID>/environ") }
+```
+
+#### Analysis
+
+Trivial.
+
+#### Fix
+
+Ban `core::include_str!` and `core::include_bytes!` with Clippy rules.
+
