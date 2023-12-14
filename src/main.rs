@@ -85,9 +85,11 @@ fn do_interaction(tmp_dir: &tempfile::TempDir) -> Result<String, err::Err> {
     if !out.status.success() {
         return Err(err::Err::from_msg_internal("no rustc found".to_string()));
     }
-    let rustc_ver = str::from_utf8(&out.stdout).map_err(|e| {
-        err::Err::from_error(Box::new(e), "failed to decode stdout as utf-8".to_string())
-    })?;
+    let rustc_ver = str::from_utf8(&out.stdout)
+        .map_err(|e| {
+            err::Err::from_error(Box::new(e), "failed to decode stdout as utf-8".to_string())
+        })?
+        .trim();
 
     let out = process::Command::new("clippy-driver")
         .arg("-V")
@@ -98,9 +100,11 @@ fn do_interaction(tmp_dir: &tempfile::TempDir) -> Result<String, err::Err> {
     if !out.status.success() {
         return Err(err::Err::from_msg_internal("no clippy found".to_string()));
     }
-    let clippy_ver = str::from_utf8(&out.stdout).map_err(|e| {
-        err::Err::from_error(Box::new(e), "failed to decode stdout as utf-8".to_string())
-    })?;
+    let clippy_ver = str::from_utf8(&out.stdout)
+        .map_err(|e| {
+            err::Err::from_error(Box::new(e), "failed to decode stdout as utf-8".to_string())
+        })?
+        .trim();
 
     let flag = env::var("FLAG")
         .map_err(|e| err::Err::from_error(Box::new(e), "no FLAG env var found".to_string()))?;
@@ -149,8 +153,10 @@ fn do_interaction(tmp_dir: &tempfile::TempDir) -> Result<String, err::Err> {
     drop(f_clippy_conf);
 
     println!("Rust can promise you a happy life... but does this proposition always hold?");
+    println!();
     println!("rustc version: {}", rustc_ver);
     println!("clippy version: {}", clippy_ver);
+    println!();
     println!(
         "Fill in this code:\n\n=====BEGIN====={}\n=====END=====\n",
         MAIN_FILE_CONTENT
@@ -169,7 +175,6 @@ fn do_interaction(tmp_dir: &tempfile::TempDir) -> Result<String, err::Err> {
     writeln!(f_src, "{}", MAIN_FILE_CONTENT.replace("@@FLAG@@", &flag))
         .map_err(|e| err::Err::from_error(Box::new(e), "failed to write to main.rs".to_string()))?;
     drop(f_src);
-
 
     let out = process::Command::new("clippy-driver")
         .args([
@@ -232,12 +237,15 @@ fn main() -> Result<(), err::Err> {
         .map_err(|e| err::Err::from_error(Box::new(e), "failed to create temp dir".to_string()))?;
     let result = do_interaction(&tmp_dir)
         .map(|s| println!("[+] {}", s))
-        .map_err(|e| {
-            match e.err_type {
-                err::ErrType::User => println!("[-] {}", e.msg),
-                err::ErrType::Internal => eprintln!("{}", e),
-            };
-            e
+        .or_else(|e| match e.err_type {
+            err::ErrType::User => {
+                println!("[-] {}", e.msg);
+                Ok(())
+            }
+            err::ErrType::Internal => {
+                eprintln!("[!] {}", e);
+                Err(e)
+            }
         });
     tmp_dir
         .close()
