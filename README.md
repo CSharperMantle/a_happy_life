@@ -88,7 +88,8 @@ fn exp<'c, 'd, T>(x: &'c T) -> &'d T {
 ```rust
 {
     // Create a local variable whose memory location may coincide with `_secret`.
-    // The length of the `&'static str` literal should be the same as `_secret`.
+    // The length of the `&'static str` literal should be the same as `_secret`,
+    // so as to maximize the likelihood of such coincidence.
     let local = String::from("aaaabaaacaaadaaa");
     // Make the reference dangle!
     exp(&local)
@@ -97,7 +98,7 @@ fn exp<'c, 'd, T>(x: &'c T) -> &'d T {
 
 #### Explanation
 
-The value `local` is dropped once it leaves its scope. But as the compiler thinks that `x`, as a reference to `local`, has a longer lifetime, it dangles after the destruction of `local`. Now, `x` could possibly (in fact, always, with `-C opt_level=0`) refer to the memory space subsequently allocated for `_secret`, creating a use-after-free scenario.
+The value `local` is dropped once it leaves its scope. But as the compiler thinks that `x`, as a reference to `local`, has a longer lifetime, it dangles after the destruction of `local`. Now, `x` could possibly (in fact, almost always, with `-C opt_level=0` and glibc malloc or Windows HeapAlloc) point to the memory space subsequently allocated for `_secret`, creating a use-after-free scenario.
 
 ### Unintended solution 1 (fixed in `v0.1.1`)
 
