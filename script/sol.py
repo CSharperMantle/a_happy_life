@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from pwn import *
 
 # TODO: Change to your own environment!
@@ -30,16 +31,21 @@ PROMPT_PART_2 = b"Now supply the content of `part_2.in` in no more than 30 lines
 
 def solve() -> tuple[bool, str | None]:
     with remote(RHOST, RPORT) as r:
+        debug("Skipping banner")
         r.recvuntil(PROMPT_BANNER_END)
+        debug("Fetching flag length")
         line_n_chars = r.recvline(keepends=False).strip()
         match REGEX_N_CHARS.match(line_n_chars.decode("utf-8")):
             case None:
                 error(f"Cannot get flag length: {line_n_chars.decode('utf-8')}")
             case m:
                 n_chars = int(m.group(1))
+        info(f"Flag length: {n_chars}")
         bogus = cyclic(n_chars).decode("utf-8")
+        debug("Sending content for `part_1.in`...")
         r.sendafter(PROMPT_PART_1, TEMPLATE_PART_1.encode("utf-8"))
         r.sendline(b"[END]")
+        debug("Sending content for `part_2.in`...")
         r.sendafter(PROMPT_PART_2, (TEMPLATE_PART_2 % bogus).encode("utf-8"))
         r.sendline(b"[END]")
         r.recvline(keepends=False)

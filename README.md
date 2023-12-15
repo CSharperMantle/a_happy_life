@@ -8,7 +8,7 @@ This challenge exploits a unsoundness hole discovered in Rust lifetime deduction
 
 See [rust-lang/rust#25860](https://github.com/rust-lang/rust/issues/25860) for the original issue. A more theoretical yet neater explanation can be found on https://counterexamples.org/nearly-universal.html.
 
-## Build environment
+## Environment
 
 * `rustc` on `PATH`. Tested with these compilers:
   * `rustc 1.76.0-nightly (d86d65bbc 2023-12-10)`
@@ -16,6 +16,7 @@ See [rust-lang/rust#25860](https://github.com/rust-lang/rust/issues/25860) for t
 * `clippy-driver` on `PATH`. Tested with these `clippy` versions:
   * `clippy 0.1.76 (d86d65bb 2023-12-10)`
 * Flag in environment variable `FLAG`
+* Windows `HeapAlloc` or glibc malloc (`ptmalloc`) allocator
 
 Run this command to start the challenge (either Release or Debug build is okay):
 
@@ -23,6 +24,29 @@ Run this command to start the challenge (either Release or Debug build is okay):
 cargo run -r
 # or
 cargo run
+```
+
+Or use the Docker image:
+
+```bash
+docker build -t csmantle/a_happy_life .
+```
+
+Then edit and run the example Python exploit. (You need to have `pwntools` in the Python environment.)
+
+```bash
+python3 ./script/sol.py
+```
+
+You should get output like this, assuming you have set up your server on `localhost:10000` and set `FLAG` to `flag{Example!Rust_u4f_is_s000_fun!}`:
+
+```text
+[x] Opening connection to localhost on port 10000
+[x] Opening connection to localhost on port 10000: Trying ::1
+[+] Opening connection to localhost on port 10000: Done
+[*] Flag length: 35
+[*] Closed connection to localhost port 10000
+[+] Flag found: flag{Example!Rust_u4f_is_s000_fun!}
 ```
 
 ## Problem
