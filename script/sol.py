@@ -1,4 +1,3 @@
-from tabnanny import verbose
 from pwn import *
 
 # TODO: Change to your own environment!
